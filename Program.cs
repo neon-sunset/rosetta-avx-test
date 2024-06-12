@@ -30,8 +30,9 @@ var features = new[]
 
 Console.WriteLine($"""
     --- Environment Information ---
-    Supported: {string.Join(", ", features.Where(f => f.IsSupported).Select(f => f.Name))}
-    Unsupported: {string.Join(", ", features.Where(f => !f.IsSupported).Select(f => f.Name))}
+    Enabled: {string.Join(", ", features.Where(f => f.IsSupported).Select(f => f.Name))}
+    Disabled: {string.Join(", ", features.Where(f => !f.IsSupported).Select(f => f.Name))}
+    (These features may have been set at compile time per IlcInstructionSet property.)
 
     """);
 
@@ -48,7 +49,7 @@ if (!Avx2.IsSupported)
 }
 Verify(ToAsciiUpper256);
 
-Console.WriteLine($"Allocating {length} MiB of memory and filling it with random data...");
+Console.Write($"Allocating {length} MiB of memory and filling it with random data...");
 
 checked { length *= 1024 * 1024; }
 var source = Alloc(length);
@@ -61,7 +62,7 @@ var choices = Enumerable
 
 Random.Shared.GetItems(choices, source);
 
-Console.WriteLine("Memory allocation and initialization completed.");
+Console.WriteLine("Done.");
 Console.WriteLine("Running benchmarks...");
 Console.WriteLine();
 
@@ -122,10 +123,10 @@ static void Execute(
     }
 
     var average = timings.Average();
-    var throughput = (length / average * 1_000_000 / 1024 / 1024) * 2;
+    var throughput = length / average * 1_000_000 / 1024 / 1024;
 
     Console.WriteLine($"Average execution time: {average:0.00} µs per iteration");
-    Console.WriteLine($"Throughput: {throughput:0.00} MiB/s");
+    Console.WriteLine($"Throughput: {throughput:0.00} MiB/s (x2: load + store)");
     Console.WriteLine($"---- Completed {name} ----{Environment.NewLine}");
 }
 
